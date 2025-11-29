@@ -14,6 +14,7 @@ model User {
   name         String
   email        String   @unique
   passwordHash String
+  profileImage Bytes?
   plants       Plant[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -30,6 +31,7 @@ model Plant {
   images      PlantImage[]
   logs        PlantLog[]
   recommendations AIRecommendation[]
+  careTips        CareTip[]
 }
 
 model PlantImage {
@@ -38,6 +40,7 @@ model PlantImage {
   plantId  Int
   imageData Bytes
   createdAt DateTime @default(now())
+  recommendations AIRecommendation[]
 }
 
 model PlantLog {
@@ -60,4 +63,18 @@ model AIRecommendation {
   suggestionText String
   imageUrl       String?
   createdAt      DateTime @default(now())
+  plantImage     PlantImage? @relation(fields: [plantImageId], references: [id], onDelete: Cascade)
+  plantImageId   Int?
+  careTips       CareTip[]
+}
+
+model CareTip {
+  id               Int               @id @default(autoincrement())
+  plant            Plant             @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  plantId          Int
+  tips             String // Storing JSON string now
+  logsUsed         String? // The user logs used to generate this tip
+  recommendation   AIRecommendation? @relation(fields: [recommendationId], references: [id])
+  recommendationId Int?
+  createdAt        DateTime          @default(now())
 }

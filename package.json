@@ -13,12 +13,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@langchain/google-genai": "^1.0.3",
     "@prisma/client": "^6.17.1",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^1.0.6",
+    "multer": "^2.0.2",
     "prisma": "^6.17.1"
   },
   "devDependencies": {

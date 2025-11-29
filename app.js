@@ -14,6 +14,9 @@ app.use('/auth', authRouter);
 
 app.use('/plants', plantsRouter);
 
+const usersRouter = require('./routes/users');
+app.use('/users', usersRouter);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
