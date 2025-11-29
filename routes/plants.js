@@ -136,7 +136,9 @@ router.get('/', authenticateToken, async (req, res) => {
       where: whereClause,
       orderBy: orderBy,
       include: { 
-        images: true,
+        images: {
+          select: { id: true, plantId: true, createdAt: true }
+        },
         logs: true,
         recommendations: {
           orderBy: { createdAt: 'desc' },
@@ -153,8 +155,7 @@ router.get('/', authenticateToken, async (req, res) => {
       ...plant,
       images: plant.images.map(image => ({
         ...image,
-        imageUrl: `/plants/images/${image.id}`,
-        imageData: undefined // Don't send heavy bytes
+        imageUrl: `/plants/images/${image.id}`
       }))
     }));
     console.log('Backend plantsWithImages (final output):', plantsWithImages);
@@ -176,7 +177,10 @@ router.get('/:id', authenticateToken, async (req, res) => {
     const plant = await prisma.plant.findFirst({
       where: { id: plantId, userId: req.user.userId },
       include: { 
-        images: { orderBy: { createdAt: 'desc' } }, 
+        images: { 
+          select: { id: true, plantId: true, createdAt: true },
+          orderBy: { createdAt: 'desc' } 
+        }, 
         logs: { orderBy: { logDate: 'desc' } }, 
         recommendations: { 
             include: { plantImage: { select: { id: true } } },
@@ -192,8 +196,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
       ...plant,
       images: plant.images.map(image => ({
         ...image,
-        imageUrl: `/plants/images/${image.id}`,
-        imageData: undefined
+        imageUrl: `/plants/images/${image.id}`
       }))
     };
 
@@ -248,7 +251,11 @@ router.put('/:id', authenticateToken, upload.single('image'), async (req, res) =
     const updatedPlant = await prisma.plant.update({
       where: { id: plantId },
       data: updatedData,
-      include: { images: true }
+      include: { 
+        images: {
+          select: { id: true, plantId: true, createdAt: true }
+        }
+      }
     });
     
     // Convert image data to URL for frontend
@@ -256,8 +263,7 @@ router.put('/:id', authenticateToken, upload.single('image'), async (req, res) =
       ...updatedPlant,
       images: updatedPlant.images.map(image => ({
         ...image,
-        imageUrl: `/plants/images/${image.id}`,
-        imageData: undefined
+        imageUrl: `/plants/images/${image.id}`
       }))
     };
 
