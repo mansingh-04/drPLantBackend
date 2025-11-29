@@ -312,6 +312,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 router.post('/:id/ai-recommendations', authenticateToken, express.json(), async (req, res) => {
   const plantId = parseInt(req.params.id);
   const { force } = req.body;
+  console.log(`AI Rec request for plant ${plantId}, force: ${force}`);
 
   try {
     const plant = await prisma.plant.findFirst({ 
@@ -331,6 +332,7 @@ router.post('/:id/ai-recommendations', authenticateToken, express.json(), async 
     });
 
     if (existingRec && !force) {
+      console.log('Returning cached recommendation');
       return res.status(200).json({ 
         status: 'cached', 
         message: 'Analysis already exists for this image',
@@ -373,6 +375,9 @@ router.post('/:id/ai-recommendations', authenticateToken, express.json(), async 
     console.error('Error creating AI recommendation:', error);
     if (error.message.includes("does not appear to be a plant")) {
         return res.status(400).json({ error: error.message });
+    }
+    if (error.message.includes("quota exceeded")) {
+        return res.status(429).json({ error: error.message });
     }
     res.status(500).json({ error: 'Failed to create AI recommendation' });
   }

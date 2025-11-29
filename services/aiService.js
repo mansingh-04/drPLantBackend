@@ -20,9 +20,15 @@ async function identifyPlant(imageBase64) {
       }
     });
     const result = response.data;
-
-    if (result.is_plant && result.is_plant.probability < 0.5) {
-      throw new Error("The image does not appear to be a plant. Please upload a clear photo of a plant.");
+    const isPlantData = result.result?.is_plant;
+    
+    if (isPlantData) {
+        console.log(`[Plant Detection] Probability: ${isPlantData.probability}`);
+        if (isPlantData.probability < 0.7) {
+            throw new Error(`The image does not appear to be a plant (Confidence: ${(isPlantData.probability * 100).toFixed(1)}%). Please upload a clear photo of a plant.`);
+        }
+    } else {
+        console.log('[Plant Detection] is_plant data missing from response');
     }
 
     const suggestions = result.result.classification.suggestions;
@@ -47,7 +53,12 @@ async function identifyPlant(imageBase64) {
     return finalres
   } catch (error) {
     console.error('Error identifying plant:', error.response ? error.response.data : error.message);
-    return error
+    
+    if (error.response && error.response.status === 429) {
+        return new Error("Plant identification service quota exceeded. Please try again later or upgrade your plan.");
+    }
+    
+    return error;
   }
 }
 
