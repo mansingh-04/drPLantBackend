@@ -88,10 +88,23 @@ router.post('/', authenticateToken, upload.single('image'), async (req, res) => 
           }]
         } : undefined
       },
-      include: { images: true }
+      include: { 
+        images: {
+          select: { id: true, plantId: true, createdAt: true }
+        }
+      }
     });
 
-    res.status(201).json(newPlant);
+    // Convert image data to URL for frontend
+    const plantWithImages = {
+      ...newPlant,
+      images: newPlant.images.map(image => ({
+        ...image,
+        imageUrl: `/plants/images/${image.id}`
+      }))
+    };
+
+    res.status(201).json(plantWithImages);
   } catch (error) {
     console.error('Error creating plant:', error);
     res.status(500).json({ error: 'Failed to create plant' });
