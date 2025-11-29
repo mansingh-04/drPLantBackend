@@ -115,7 +115,6 @@ router.post('/', authenticateToken, upload.single('image'), async (req, res) => 
 
 router.get('/', authenticateToken, async (req, res) => {
   const { searchTerm, page, limit, sortBy, sortOrder } = req.query;
-  console.log('Backend GET /plants received:', { searchTerm, page, limit, sortBy, sortOrder });
 
   const currentPage = parseInt(page) || 1;
   const itemsPerPage = parseInt(limit) || 10;
@@ -131,7 +130,7 @@ router.get('/', authenticateToken, async (req, res) => {
       { species: { contains: searchTerm, mode: 'insensitive' } },
     ];
   }
-  console.log('Backend whereClause:', whereClause);
+
 
   // Construct orderBy based on sortBy and sortOrder
   let orderBy = { createdAt: 'desc' }; // Default
@@ -143,7 +142,6 @@ router.get('/', authenticateToken, async (req, res) => {
 
   try {
     const totalPlants = await prisma.plant.count({ where: whereClause });
-    console.log('Backend totalPlants:', totalPlants);
 
     const plants = await prisma.plant.findMany({
       where: whereClause,
@@ -159,9 +157,7 @@ router.get('/', authenticateToken, async (req, res) => {
         }
       },
       skip: skip,
-      take: itemsPerPage,
     });
-    console.log('Backend raw plants data:', plants);
     
     // Convert image data to URL for frontend
     const plantsWithImages = plants.map(plant => ({
@@ -171,7 +167,6 @@ router.get('/', authenticateToken, async (req, res) => {
         imageUrl: `/plants/images/${image.id}`
       }))
     }));
-    console.log('Backend plantsWithImages (final output):', plantsWithImages);
 
     res.json({ plants: plantsWithImages, total: totalPlants });
   } catch (error) {
@@ -461,7 +456,6 @@ router.post('/:id/care-tips', authenticateToken, express.json(), async (req, res
         const recMatch = latestCareTip.recommendationId === recId;
 
         if (logsMatch && recMatch) {
-            console.log("Returning cached care tips");
             return res.json({ 
                 status: 'cached', 
                 careTips: latestCareTip.tips 
@@ -469,7 +463,6 @@ router.post('/:id/care-tips', authenticateToken, express.json(), async (req, res
         }
     }
 
-    console.log("Generating new care tips...");
     const careTips = await getPlantCareTips(plant.name, diseaseInfo, logsText);
 
     // Save to DB
