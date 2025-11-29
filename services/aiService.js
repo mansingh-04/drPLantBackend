@@ -21,6 +21,10 @@ async function identifyPlant(imageBase64) {
     });
     const result = response.data;
 
+    if (result.is_plant && result.is_plant.probability < 0.5) {
+      throw new Error("The image does not appear to be a plant. Please upload a clear photo of a plant.");
+    }
+
     const suggestions = result.result.classification.suggestions;
     const plantName = suggestions.length ? suggestions[0].name : 'Unknown';
     const diseases = result.result.disease?.suggestions || [];

@@ -371,6 +371,9 @@ router.post('/:id/ai-recommendations', authenticateToken, express.json(), async 
 
   } catch (error) {
     console.error('Error creating AI recommendation:', error);
+    if (error.message.includes("does not appear to be a plant")) {
+        return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: 'Failed to create AI recommendation' });
   }
 });
