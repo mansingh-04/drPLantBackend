@@ -150,18 +150,20 @@ router.get('/', authenticateToken, async (req, res) => {
         images: {
           select: { id: true, plantId: true, createdAt: true }
         },
-        logs: true,
+        _count: { select: { logs: true } },
         recommendations: {
           orderBy: { createdAt: 'desc' },
           take: 1
         }
       },
       skip: skip,
+      take: itemsPerPage,
     });
     
     // Convert image data to URL for frontend
     const plantsWithImages = plants.map(plant => ({
       ...plant,
+      logCount: plant._count.logs,
       images: plant.images.map(image => ({
         ...image,
         imageUrl: `/plants/images/${image.id}`

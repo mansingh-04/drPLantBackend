@@ -22,15 +22,14 @@ exports.getProfile = async (req, res) => {
     }
 
     // Check if user has a profile image
-    const userWithImage = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { profileImage: true }
+    const userImageCount = await prisma.user.count({
+      where: { id: userId, profileImage: { not: null } }
     });
 
     res.json({
       ...user,
-      hasProfileImage: !!userWithImage.profileImage,
-      profileImageUrl: userWithImage.profileImage ? `/users/profile-image/${userId}` : null
+      hasProfileImage: userImageCount > 0,
+      profileImageUrl: userImageCount > 0 ? `/users/profile-image/${userId}` : null
     });
   } catch (error) {
     console.error('Error fetching profile:', error);
