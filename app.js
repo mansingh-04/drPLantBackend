@@ -26,8 +26,8 @@ const path = require('path');
 // app.get(/.*/, (req, res) => {
 //   res.sendFile(path.join(__dirname, '../Frontend/dist/index.html'));
 // });
-// Health check endpoint for uptime bot
-app.get('/health', (req, res) => {
+// Health check endpoint for uptime bot and Render
+app.get(['/health', '/healthz'], (req, res) => {
   res.status(200).send('OK');
 });
 
