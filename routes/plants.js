@@ -148,7 +148,9 @@ router.get('/', authenticateToken, async (req, res) => {
       orderBy: orderBy,
       include: { 
         images: {
-          select: { id: true, plantId: true, createdAt: true }
+          select: { id: true, plantId: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+          take: 1
         },
         _count: { select: { logs: true } },
         recommendations: {
